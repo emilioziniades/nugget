@@ -11,4 +11,6 @@ This is a WIP. Features:
 - [ ] Filter nugets by a prefix
 - [ ] Make terminal output a little more palateable
 
-So far, just change into a dotnet project with a solution file, and run `nugget`. This will trigger an interactive process where you can select which nugets to update.
+I'm too lazy to publish this on crates.io just yet. To install, `git clone https://github.com/emilioziniades/nugget && cd nugget && cargo install --path .`.
+
+To use, ensure you are in the folder containing the dotnet project whose nugets you would like to update, and run `nugget`. This will trigger an interactive process where you can select which nugets to update.
