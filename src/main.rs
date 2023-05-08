@@ -174,6 +174,8 @@ fn update_dependency(dependency: Dependency, projects: &[String]) {
             .arg(project)
             .arg("package")
             .arg(&dependency.name)
+            .arg("--version")
+            .arg(&dependency.latest)
             .arg("--no-restore") // skip restoring as dotnet will complain about package downgrades
             .output()
             .unwrap();
