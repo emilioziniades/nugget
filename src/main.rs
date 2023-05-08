@@ -142,7 +142,7 @@ fn get_outdated_dependencies() -> HashMap<Dependency, Vec<String>> {
     let output = stringify_bytes(&output.stdout);
 
     let mut dependency_map = HashMap::new();
-    let mut current_project: String = String::new();
+    let mut current_project = String::new();
 
     for line in output.lines() {
         if line.starts_with("The given project") {
@@ -155,7 +155,7 @@ fn get_outdated_dependencies() -> HashMap<Dependency, Vec<String>> {
                 "Project `{}` has the following updates to its packages",
                 line.bytes()
             );
-        } else if line.contains(">") {
+        } else if line.contains('>') {
             let dependency = Dependency::from(line);
             dependency_map
                 .entry(dependency)
@@ -183,6 +183,6 @@ fn update_dependency(dependency: Dependency, projects: &[String]) {
     }
 }
 
-fn stringify_bytes(bytes: &Vec<u8>) -> &str {
+fn stringify_bytes(bytes: &[u8]) -> &str {
     std::str::from_utf8(bytes).unwrap()
 }
