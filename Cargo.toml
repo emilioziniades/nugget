@@ -1,6 +1,6 @@
 [package]
 name = "nugget"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Emilio Ziniades <emilioziniades@protonmail.com>"]
 license = "MIT"
 edition = "2021"
