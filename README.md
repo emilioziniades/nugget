@@ -11,7 +11,7 @@ This is a WIP. Features:
 - [x] Filter nugets by a prefix
 - [ ] Make terminal output a little more palateable
 
-I'm too lazy to publish this on crates.io just yet. To install, `git clone https://github.com/emilioziniades/nugget && cd nugget && cargo install --path .`.
+To install, run `cargo install nuggets`.
 
 To use, ensure you are in the folder containing the dotnet project whose nugets you would like to update, and run `nugget`. This will trigger an interactive process where you can select which nugets to update. For more usage details, run `nugget --help`.
 

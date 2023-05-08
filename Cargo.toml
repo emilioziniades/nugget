@@ -1,7 +1,14 @@
 [package]
 name = "nugget"
-version = "0.1.0"
+version = "0.0.1"
+authors = ["Emilio Ziniades <emilioziniades@protonmail.com>"]
+license = "MIT"
 edition = "2021"
+description = "wrapper around dotnet CLI with enhanced functionality"
+repository = "https://github.com/emilioziniades/nuggets"
+homepage = "https://github.com/emilioziniades/nuggets"
+categories = ["command-line-utilities", "development-tools"]
+keywords = ["cli"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
