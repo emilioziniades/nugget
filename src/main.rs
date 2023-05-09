@@ -2,7 +2,7 @@ use clap::Parser;
 use std::{
     collections::HashMap,
     io::{stdin, stdout, Write},
-    process::{exit, Command},
+    process::{exit, Command, Output},
 };
 
 /// command line tool for better nuget management
@@ -16,6 +16,53 @@ struct Args {
     prefixes: Vec<String>,
 }
 
+trait OutputDisplayer: Sized {
+    fn print_output(self) -> Self;
+    fn get_output(self) -> String;
+}
+
+impl OutputDisplayer for Output {
+    fn print_output(self) -> Self {
+        println!("{}", stringify_bytes(&self.stdout));
+        println!("{}", stringify_bytes(&self.stderr));
+        self
+    }
+
+    fn get_output(self) -> String {
+        stringify_bytes(&self.stdout).to_string()
+    }
+}
+
+struct Dotnet;
+
+impl Dotnet {
+    fn restore() -> Output {
+        Command::new("dotnet").arg("restore").output().unwrap()
+    }
+
+    fn list_outdated() -> Output {
+        Command::new("dotnet")
+            .arg("list")
+            .arg("package")
+            .arg("--outdated")
+            .output()
+            .unwrap()
+    }
+
+    fn update_package(project: &str, dependency: &str, version: &str) -> Output {
+        Command::new("dotnet")
+            .arg("add")
+            .arg(project)
+            .arg("package")
+            .arg(dependency)
+            .arg("--version")
+            .arg(version)
+            .arg("--no-restore") // skip restoring as dotnet will complain about package downgrades
+            .output()
+            .unwrap()
+    }
+}
+
 #[derive(Debug, Hash, PartialEq, Eq)]
 struct Dependency {
     name: String,
@@ -27,7 +74,7 @@ struct Dependency {
 impl From<&str> for Dependency {
     // assumes a dependency is expressed as a line of the following form:
     //              > ThePackage        1.0.11        1.0.11        1.0.14
-    //                ^ name              ^ requested   ^resolved   ^ latest
+    //                ^ name            ^ requested   ^resolved     ^ latest
     //  it is incredibly brittle and may break at any moment. Unfortunately
     //  dotnet does not provide the data in any structured form such as JSON.
     fn from(line: &str) -> Self {
@@ -122,24 +169,17 @@ fn main() {
     }
 
     // restore once all upgrades have happened
-    let output = Command::new("dotnet").arg("restore").output().unwrap();
-    println!("{}", stringify_bytes(&output.stdout));
+    Dotnet::restore().print_output();
 }
 
 fn get_outdated_dependencies() -> HashMap<Dependency, Vec<String>> {
-    let output = Command::new("dotnet")
-        .arg("list")
-        .arg("package")
-        .arg("--outdated")
-        .output()
-        .unwrap();
+    let output = Dotnet::list_outdated().print_output();
 
     if !output.status.success() {
-        println!("{}", stringify_bytes(&output.stderr));
         exit(output.status.code().unwrap())
     }
 
-    let output = stringify_bytes(&output.stdout);
+    let output = output.get_output();
 
     let mut dependency_map = HashMap::new();
     let mut current_project = String::new();
@@ -169,17 +209,7 @@ fn get_outdated_dependencies() -> HashMap<Dependency, Vec<String>> {
 
 fn update_dependency(dependency: Dependency, projects: &[String]) {
     for project in projects {
-        let output = Command::new("dotnet")
-            .arg("add")
-            .arg(project)
-            .arg("package")
-            .arg(&dependency.name)
-            .arg("--version")
-            .arg(&dependency.latest)
-            .arg("--no-restore") // skip restoring as dotnet will complain about package downgrades
-            .output()
-            .unwrap();
-        println!("{}", stringify_bytes(&output.stdout));
+        Dotnet::update_package(project, &dependency.name, &dependency.latest).print_output();
     }
 }
 
