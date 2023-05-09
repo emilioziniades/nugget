@@ -119,6 +119,9 @@ impl Action {
 fn main() {
     let args = Args::parse();
 
+    // restore at start
+    Dotnet::restore().print_output();
+
     let outdated_dependencies = if !args.prefixes.is_empty() {
         get_outdated_dependencies()
             .into_iter()
